@@ -100,13 +100,15 @@ class TurnState():
             just_rolled[die_num] = randint(1, 6)
 
         self.show_dice(just_rolled)
+        indices = self.get_dice_to_save()
+        self.save_rolled(just_rolled, indices)
 
     def show_dice(self, just_rolled):
         print("        [ 1 2 3 4 5 ]")
         dice_str = []
         length = 0
         if len(self.saved_dice) > 0:
-            dice_str.append("Saved:    ")
+            dice_str.append("Saved:   ")
             for die in self.saved_dice:
                 dice_str.append(" ")
                 dice_str.append(str(die))
@@ -122,11 +124,45 @@ class TurnState():
             dice_str.append("\n")
         print(''.join(dice_str))
 
+    def get_dice_to_save(self):
+        nums = input("Enter the number of dice you want to save:  ")
+        if nums is None or len(nums) == 0:
+            return []
+        num_arr = map(int, nums.split(" "))
+        return [num for num in num_arr if num > len(self.saved_dice)]
+
+    def save_rolled(self, just_rolled, indices):
+        if self.dice_roll == 3:
+            for die in just_rolled:
+                self.saved_dice.append(die)
+        else:
+            for idx in indices:
+                idx -= len(self.saved_dice) + 1
+                dice_score = just_rolled[idx]
+                just_rolled.remove(dice_score)
+                self.saved_dice.append(dice_score)
+
+
+def print_rules():
+    print("~~~~~~~~Starting the game of Yahtzee~~~~~~~~\n")
+    print("Okay, here are the rules: ")
+    print("The game will roll all dice not saved for you.  Nice!")
+    print("You will be prompted to save and unsave dice at the end of a roll")
+    print("    Enter the indicies of dice you want to save seperated by spaces!")
+    print("        eg: \"1 2 5\" will save the first, second, and 5th dice")
+    print("          (provided they are not already saved!)")
+    print("    Maximum of only 3 rolls per turn!")
+    print("Your turn ends when you have saved all your dice, or after the 3rd roll")
+    print("You will then enter your score into the field.  Scouts honor!")
+    print("Game ends when you fill the score card.  Good Luck! \n\n")
+
+
 def main():
-    print("~~~~~~~~Starting the game of Yahtzee~~~~~~~~\n\n")
+    print_rules()
     test_turn = TurnState()
     while not test_turn.stop_turn():
         test_turn.roll_dice()
-
+    print("\nYour dice from that turn are: ")
+    print(test_turn.saved_dice)
 if __name__ == '__main__':
     main()
