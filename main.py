@@ -1,11 +1,13 @@
 from random import randint
 turn = 0
 
+
 class ScoreRound():
 
-    rows = ['s1', 's2', 's3', 's4', 's5', 's6', 'kind3', 'kind4',
-            'full_house', 'sm_strt', 'lg_strt', 'yahtzee', 'chance',
-            'bonus']
+    rows = [
+        's1', 's2', 's3', 's4', 's5', 's6', 'kind3', 'kind4', 'full_house',
+        'sm_strt', 'lg_strt', 'yahtzee', 'chance', 'bonus'
+    ]
 
     rows_pretty = {
         's1': ['ones', 'one', '1s', '1'],
@@ -17,10 +19,14 @@ class ScoreRound():
         'kind3': ['three of a kind', '3 of a kind'],
         'kind4': ['four of a kind', '4 of a kind'],
         'full_house': ['full house'],
-        'sm_strt': ['small straight', 'sm strt', 'sm straight', 'small strt',
-                     'sm straight'],
-        'lg_strt': ['large straight', 'lg strt', 'lg straight', 'large strt',
-                     'lg straight'],
+        'sm_strt': [
+            'small straight', 'sm strt', 'sm straight', 'small strt',
+            'sm straight'
+        ],
+        'lg_strt': [
+            'large straight', 'lg strt', 'lg straight', 'large strt',
+            'lg straight'
+        ],
         'bonus': ['bonus yahtzee', 'yahtzee bonus']
     }
 
@@ -57,8 +63,10 @@ class ScoreRound():
             total += 35
 
         # Lower
-        for row in ['full_house', 'sm_strt', 'lg_strt', 'yahtzee', 'chance',
-                    'bonus']:
+        for row in [
+                'full_house', 'sm_strt', 'lg_strt', 'yahtzee', 'chance',
+                'bonus'
+        ]:
             sl = self.__dict__[row]
             if sl is not None:
                 total += sl
@@ -74,12 +82,12 @@ class ScoreRound():
             else:
                 self.__dict__[field] = score
 
+
 def turn_num():
     print("Turn Number: %d" % (turn))
 
 
 class TurnState():
-
     def __init__(self):
         self.NUM_DICE = 5
         self.dice_roll = 0
@@ -100,8 +108,7 @@ class TurnState():
             just_rolled[die_num] = randint(1, 6)
 
         self.show_dice(just_rolled)
-        indices = self.get_dice_to_save()
-        self.save_rolled(just_rolled, indices)
+        self.saved_dice += self.get_dice_to_save2(just_rolled)
 
     def show_dice(self, just_rolled):
         print("        [ 1 2 3 4 5 ]")
@@ -131,6 +138,33 @@ class TurnState():
         num_arr = map(int, nums.split(" "))
         return [num for num in num_arr if num > len(self.saved_dice)]
 
+    def get_dice_to_save2(self, rolled):
+        """
+        Accepts `1 2 3` or `1, 2, 3`
+        """
+        roll_orig = rolled
+        nums = input("Which dice do you want to save? ")
+        if nums is None or len(nums) <= 0:
+            return []
+        nums = list(map(
+            int, "".join(list(filter(lambda c: c in '0123456790 ',
+                                     nums))).split(" ")))
+        if len(nums) > 3 or len(nums) + len(self.saved_dice) > 5:
+            print("You can't save that many!")
+            return get_dice_to_save2(self, rolled_orig)
+        keeps = []
+        def pop_member(dice):
+            if dice in rolled:
+                keeps.append(dice)
+                rolled.remove(dice)
+            else:
+                print("You don't have any %ds!" % (dice))
+                return get_dice_to_save2(self, rolled_orig)
+        for dice in nums:
+            pop_member(dice)
+        return keeps
+
+
     def save_rolled(self, just_rolled, indices):
         if self.dice_roll == 3:
             for die in just_rolled:
@@ -148,11 +182,14 @@ def print_rules():
     print("Okay, here are the rules: ")
     print("The game will roll all dice not saved for you.  Nice!")
     print("You will be prompted to save and unsave dice at the end of a roll")
-    print("    Enter the indicies of dice you want to save seperated by spaces!")
+    print(
+        "    Enter the indicies of dice you want to save seperated by spaces!")
     print("        eg: \"1 2 5\" will save the first, second, and 5th dice")
     print("          (provided they are not already saved!)")
     print("    Maximum of only 3 rolls per turn!")
-    print("Your turn ends when you have saved all your dice, or after the 3rd roll")
+    print(
+        "Your turn ends when you have saved all your dice, or after the 3rd roll"
+    )
     print("You will then enter your score into the field.  Scouts honor!")
     print("Game ends when you fill the score card.  Good Luck! \n\n")
 
@@ -164,5 +201,7 @@ def main():
         test_turn.roll_dice()
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
+
+
 if __name__ == '__main__':
     main()
