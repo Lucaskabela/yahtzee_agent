@@ -159,10 +159,15 @@ def print_rules():
 
 def main():
     print_rules()
+    score = ScoreRound()
     test_turn = TurnState()
     while not test_turn.stop_turn():
         test_turn.roll_dice()
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
+    field = input("Where do you want to put your points? ")
+    pts = int(input("How many points should I put there? "))
+    score.fill(field, pts)
+    print("Game over, you got: " + str(score.score()))
 if __name__ == '__main__':
     main()
