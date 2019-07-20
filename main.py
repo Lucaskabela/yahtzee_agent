@@ -1,5 +1,4 @@
 from random import randint
-turn = 0
 
 class ScoreRound():
 
@@ -73,9 +72,8 @@ class ScoreRound():
                       ScoreRound.row_pretty(field) + '"!')
             else:
                 self.__dict__[field] = score
-
-def turn_num():
-    print("Turn Number: %d" % (turn))
+                return True 
+        return False
 
 
 class TurnState():
@@ -157,17 +155,36 @@ def print_rules():
     print("Game ends when you fill the score card.  Good Luck! \n\n")
 
 
-def main():
-    print_rules()
-    score = ScoreRound()
-    test_turn = TurnState()
-    while not test_turn.stop_turn():
-        test_turn.roll_dice()
+def get_turn_score(test_turn):
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
     field = input("Where do you want to put your points? ")
     pts = int(input("How many points should I put there? "))
-    score.fill(field, pts)
+    return field, pts
+
+
+def turn_num(turn):
+    print("\n~~~~~Turn Number: %d~~~~~" % (turn))
+
+
+def main():
+    print_rules()
+    score = ScoreRound()
+    turns = []
+    while len(turns) < 13: 
+        curr_turn = TurnState()
+        turn_num(len(turns) + 1)
+        while not curr_turn.stop_turn():
+            curr_turn.roll_dice()
+        
+        field, pts = get_turn_score(curr_turn)
+        while not score.fill(field, pts):
+            field, pts = get_turn_score(curr_turn)
+
+        turns.append(curr_turn)
+
     print("Game over, you got: " + str(score.score()))
+
+
 if __name__ == '__main__':
     main()
