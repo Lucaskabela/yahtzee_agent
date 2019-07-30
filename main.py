@@ -75,6 +75,94 @@ class ScoreRound():
                 return True 
         return False
 
+    def fill(self, field, dice):
+        score = 0
+        field = ScoreRound.decode_row(field)
+        if field == 's1':
+            # count the number of ones
+            score = self.score_num(1, dice)
+        elif field == 's2':
+            score = self.score_num(2, dice)
+        elif field == 's3':
+            score = self.score_num(3, dice)
+        elif field == 's4':
+            score = self.score_num(4, dice)
+        elif field == 's5':
+            score = self.score_num(5, dice)
+        elif field == 's6':
+            score = self.score_num(6, dice)
+        elif field == 'kind3':
+            score = self.get_kind3_score(dice)
+        elif field == 'kind4':
+            score = self.get_kind4_score(dice)
+        elif field == 'full_house':
+            score = self.get_full_house_score(dice)
+        elif field == 'sm_strt':
+            score = self.get_sm_strt_score(dice)
+        elif field == 'lg_strt':
+            score = self.get_lg_strt_score(dice)
+        elif field == 'yahtzee':
+            score = self.get_yahtzee(dice)
+        elif field == 'chance':
+            score = sum(dice)
+                
+
+        if field is not None:
+            if self.__dict__[field] is not None:
+                print('Nice try! You\'ve already scored "' +
+                      ScoreRound.row_pretty(field) + '"!')
+            else:
+                self.__dict__[field] = score
+                print("Put %d points in %s" % (score, field))
+                return True 
+        return False
+
+    def score_num(self, number, dice):
+        return sum(number for die in dice if die == number)
+
+    def get_kind3_score(self, dice):
+        num_same = [0] * 6
+        for die  in dice:
+            num_same[die - 1] += 1
+        return sum(dice) if 3 in num_same or 4 in num_same or 5 in num_same else 0
+
+    def get_kind4_score(self, dice):
+        num_same = [0] * 6
+        for die  in dice:
+            num_same[die - 1] += 1
+        return sum(dice) if 4 in num_same or 5 in num_same else 0
+
+    def get_full_house_score(self, dice):
+        num_same = [0] * 6
+        for die  in dice:
+            num_same[die - 1] += 1
+        return 25 if 3 in num_same and 2 in num_same else 0
+
+    def get_sm_strt_score(self, dice):
+        dice.sort()
+        straights = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6]]
+        for possible in straights:
+            not_in = False
+            for num in possible:
+                if num not in dice:
+                    not_in = True
+            if not not_in:
+                return 30
+        return 0
+
+    def get_lg_strt_score(self, dice):
+        dice.sort()
+        straights = [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6]]
+        for possible in straights:
+            if possible == dice:
+                return 40
+        return 0
+
+    def get_yahtzee(self, dice):
+        num_same = [0] * 6
+        for die  in dice:
+            num_same[die - 1] += 1
+        return 50 if 5 in num_same else 0
 
 class TurnState():
 
@@ -159,8 +247,8 @@ def get_turn_score(test_turn):
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
     field = input("Where do you want to put your points? ")
-    pts = int(input("How many points should I put there? "))
-    return field, pts
+    # pts = int(input("How many points should I put there? "))
+    return field
 
 
 def turn_num(turn):
@@ -177,9 +265,9 @@ def main():
         while not curr_turn.stop_turn():
             curr_turn.roll_dice()
         
-        field, pts = get_turn_score(curr_turn)
-        while not score.fill(field, pts):
-            field, pts = get_turn_score(curr_turn)
+        field = get_turn_score(curr_turn)
+        while not score.fill(field, curr_turn.saved_dice):
+            field = get_turn_score(curr_turn)
 
         turns.append(curr_turn)
 
