@@ -1,5 +1,4 @@
 from random import randint
-turn = 0
 
 
 class ScoreRound():
@@ -81,10 +80,97 @@ class ScoreRound():
                       ScoreRound.row_pretty(field) + '"!')
             else:
                 self.__dict__[field] = score
+                return True
+        return False
 
+    def fill(self, field, dice):
+        score = 0
+        field = ScoreRound.decode_row(field)
+        if field == 's1':
+            # count the number of ones
+            score = self.score_num(1, dice)
+        elif field == 's2':
+            score = self.score_num(2, dice)
+        elif field == 's3':
+            score = self.score_num(3, dice)
+        elif field == 's4':
+            score = self.score_num(4, dice)
+        elif field == 's5':
+            score = self.score_num(5, dice)
+        elif field == 's6':
+            score = self.score_num(6, dice)
+        elif field == 'kind3':
+            score = self.get_kind3_score(dice)
+        elif field == 'kind4':
+            score = self.get_kind4_score(dice)
+        elif field == 'full_house':
+            score = self.get_full_house_score(dice)
+        elif field == 'sm_strt':
+            score = self.get_sm_strt_score(dice)
+        elif field == 'lg_strt':
+            score = self.get_lg_strt_score(dice)
+        elif field == 'yahtzee':
+            score = self.get_yahtzee(dice)
+        elif field == 'chance':
+            score = sum(dice)
 
-def turn_num():
-    print("Turn Number: %d" % (turn))
+        if field is not None:
+            if self.__dict__[field] is not None:
+                print('Nice try! You\'ve already scored "' +
+                      ScoreRound.row_pretty(field) + '"!')
+            else:
+                self.__dict__[field] = score
+                print("Put %d points in %s" % (score, field))
+                return True
+        return False
+
+    def score_num(self, number, dice):
+        return sum(number for die in dice if die == number)
+
+    def get_kind3_score(self, dice):
+        num_same = [0] * 6
+        for die in dice:
+            num_same[die - 1] += 1
+        return sum(
+            dice) if 3 in num_same or 4 in num_same or 5 in num_same else 0
+
+    def get_kind4_score(self, dice):
+        num_same = [0] * 6
+        for die in dice:
+            num_same[die - 1] += 1
+        return sum(dice) if 4 in num_same or 5 in num_same else 0
+
+    def get_full_house_score(self, dice):
+        num_same = [0] * 6
+        for die in dice:
+            num_same[die - 1] += 1
+        return 25 if 3 in num_same and 2 in num_same else 0
+
+    def get_sm_strt_score(self, dice):
+        dice.sort()
+        straights = [[1, 2, 3, 4], [2, 3, 4, 5], [3, 4, 5, 6]]
+        for possible in straights:
+            not_in = False
+            for num in possible:
+                if num not in dice:
+                    not_in = True
+            if not not_in:
+                return 30
+        return 0
+
+    def get_lg_strt_score(self, dice):
+        dice.sort()
+        straights = [[1, 2, 3, 4, 5], [2, 3, 4, 5, 6]]
+        for possible in straights:
+            if possible == dice:
+                return 40
+        return 0
+
+    def get_yahtzee(self, dice):
+        num_same = [0] * 6
+        for die in dice:
+            num_same[die - 1] += 1
+        return 50 if 5 in num_same else 0
 
 
 class TurnState():
@@ -146,13 +232,15 @@ class TurnState():
         nums = input("Which dice do you want to save? ")
         if nums is None or len(nums) <= 0:
             return []
-        nums = list(map(
-            int, "".join(list(filter(lambda c: c in '0123456790 ',
-                                     nums))).split(" ")))
+        nums = list(
+            map(
+                int, "".join(list(filter(lambda c: c in '0123456790 ',
+                                         nums))).split(" ")))
         if len(nums) > 3 or len(nums) + len(self.saved_dice) > 5:
             print("You can't save that many!")
             return get_dice_to_save2(self, rolled_orig)
         keeps = []
+
         def pop_member(dice):
             if dice in rolled:
                 keeps.append(dice)
@@ -160,10 +248,10 @@ class TurnState():
             else:
                 print("You don't have any %ds!" % (dice))
                 return get_dice_to_save2(self, rolled_orig)
+
         for dice in nums:
             pop_member(dice)
         return keeps
-
 
     def save_rolled(self, just_rolled, indices):
         if self.dice_roll == 3:
@@ -187,20 +275,41 @@ def print_rules():
     print("        eg: \"1 2 5\" will save the first, second, and 5th dice")
     print("          (provided they are not already saved!)")
     print("    Maximum of only 3 rolls per turn!")
-    print(
-        "Your turn ends when you have saved all your dice, or after the 3rd roll"
-    )
+    print("Your turn ends when you have saved all your dice, or after the "
+          "3rd roll")
     print("You will then enter your score into the field.  Scouts honor!")
     print("Game ends when you fill the score card.  Good Luck! \n\n")
 
 
-def main():
-    print_rules()
-    test_turn = TurnState()
-    while not test_turn.stop_turn():
-        test_turn.roll_dice()
+def get_turn_score(test_turn):
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
+    field = input("Where do you want to put your points? ")
+    # pts = int(input("How many points should I put there? "))
+    return field
+
+
+def turn_num(turn):
+    print("\n~~~~~Turn Number: %d~~~~~" % (turn))
+
+
+def main():
+    print_rules()
+    score = ScoreRound()
+    turns = []
+    while len(turns) < 13:
+        curr_turn = TurnState()
+        turn_num(len(turns) + 1)
+        while not curr_turn.stop_turn():
+            curr_turn.roll_dice()
+
+        field = get_turn_score(curr_turn)
+        while not score.fill(field, curr_turn.saved_dice):
+            field = get_turn_score(curr_turn)
+
+        turns.append(curr_turn)
+
+    print("Game over, you got: " + str(score.score()))
 
 
 if __name__ == '__main__':
