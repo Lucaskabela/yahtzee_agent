@@ -236,21 +236,24 @@ class TurnState():
             map(
                 int, "".join(list(filter(lambda c: c in '0123456790 ',
                                          nums))).split(" ")))
-        if len(nums) > 3 or len(nums) + len(self.saved_dice) > 5:
+        if len(nums) > 5 or len(nums) + len(self.saved_dice) > 5:
             print("You can't save that many!")
-            return get_dice_to_save2(self, rolled_orig)
+            return self.get_dice_to_save2(roll_orig)
         keeps = []
 
         def pop_member(dice):
             if dice in rolled:
                 keeps.append(dice)
                 rolled.remove(dice)
+                return None
             else:
                 print("You don't have any %ds!" % (dice))
-                return get_dice_to_save2(self, rolled_orig)
+                return self.get_dice_to_save2(roll_orig)
 
         for dice in nums:
-            pop_member(dice)
+            val = pop_member(dice)
+            if val is not None:
+                return val
         return keeps
 
     def save_rolled(self, just_rolled, indices):
