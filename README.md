@@ -12,17 +12,11 @@ tired of losing and wanted to make an A.I. that maximized the chance of me
 winning!
 
 ## Gameplan:
-
-1. Need Turn State
-	a. Dice rolls
-	b. Continue or Stop
-	c. Where to add score
-
-2. Need Player State
-	a. Score
-	b. Turn Number
-
-3. Need Agent
+1. TODO: Core game needs a few more features, namely:
+	- unsaving dice
+	- displaying score card
+	
+2. Need Agent
 	a. Decision Making
 		- likely rule based (optimal solution maybe discovered?)
 		- neural net (pytorch?)
