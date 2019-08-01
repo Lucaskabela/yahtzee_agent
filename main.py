@@ -195,6 +195,9 @@ class TurnState():
 
         self.show_dice(just_rolled)
         self.saved_dice += self.get_dice_to_save2(just_rolled)
+        if self.dice_roll < 3:
+            print("Saved: " + str(self.saved_dice))
+            self.get_dice_to_unsave()
 
     def show_dice(self, just_rolled):
         print("        [ 1 2 3 4 5 ]")
@@ -230,8 +233,13 @@ class TurnState():
         """
         roll_orig = rolled
         nums = input("Which dice do you want to save? ")
-        if nums is None or len(nums) <= 0:
+        if self.dice_roll == 3:
+            for die in rolled:
+                self.saved_dice.append(die)
             return []
+        elif nums is None or len(nums) <= 0:
+            return []
+
         nums = list(
             map(
                 int, "".join(list(filter(lambda c: c in '0123456790 ',
@@ -255,6 +263,30 @@ class TurnState():
             if val is not None:
                 return val
         return keeps
+
+    def get_dice_to_unsave(self):
+        nums = input("Which dice do you want to unsave? ")
+        if nums is None or len(nums) <= 0:
+            return []
+        nums = list(
+            map(
+                int, "".join(list(filter(lambda c: c in '0123456790 ',
+                                         nums))).split(" ")))
+        if len(self.saved_dice) < len(nums):
+            print("You don't have that many dice!")
+            return self.get_dice_to_save2(roll_orig)
+
+        def pop_member(dice):
+            if dice in self.saved:
+                self.saved_dice.remove(dice)
+                return None
+            else:
+                print("You don't have any %ds!" % (dice))
+                return self.get_dice_to_unsave()
+
+        for dice in nums:
+           pop_member(dice)
+
 
     def save_rolled(self, just_rolled, indices):
         if self.dice_roll == 3:
