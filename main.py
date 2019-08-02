@@ -172,6 +172,17 @@ class ScoreRound():
             num_same[die - 1] += 1
         return 50 if 5 in num_same else 0
 
+    def display_score(self):
+        header = ['FIELDS: |']
+        scores = ['SCORES: |']
+        for field in self.rows:
+            score = str(self.__dict__[field]) if self.__dict__[field] is not None else '---'
+            header.append('{0:^10s}|'.format(field))
+            scores.append('{0:^10s}|'.format(score))
+
+        print(''.join(header))
+        print(''.join(scores))
+
 
 class TurnState():
     def __init__(self):
@@ -343,6 +354,7 @@ def main():
             field = get_turn_score(curr_turn)
 
         turns.append(curr_turn)
+        score.display_score()
 
     print("Game over, you got: " + str(score.score()))
 
