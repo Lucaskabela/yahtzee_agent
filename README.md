@@ -12,12 +12,10 @@ tired of losing and wanted to make an A.I. that maximized the chance of me
 winning!
 
 ## Gameplan:
-1. TODO: Core game needs a few more features, namely:
-	- unsaving dice
-	- displaying score card
-	
-2. Need Agent
+Functionality is in place, time to start on Agent!!!
+NOTE:  Would like to perform a code refactor before that, just to add structure	
+
+1. Need Agent
 	a. Decision Making
-		- likely rule based (optimal solution maybe discovered?)
-		- neural net (pytorch?)
-		- hidden markov model (next states?)
+		- likely rule based (optimal solution is discovered, only like a million
+		  states.

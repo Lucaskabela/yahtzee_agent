@@ -233,6 +233,7 @@ class TurnState():
 
     def get_dice_to_save(self):
         nums = input("Enter the number of dice you want to save:  ")
+        nums.strip()
         if nums is None or len(nums) == 0:
             return []
         num_arr = map(int, nums.split(" "))
@@ -244,6 +245,7 @@ class TurnState():
         """
         roll_orig = rolled
         nums = input("Which dice do you want to save? ")
+        nums = nums.strip()
         if self.dice_roll == 3:
             for die in rolled:
                 self.saved_dice.append(die)
@@ -277,6 +279,7 @@ class TurnState():
 
     def get_dice_to_unsave(self):
         nums = input("Which dice do you want to unsave? ")
+        nums.strip()
         if nums is None or len(nums) <= 0:
             return []
         nums = list(
@@ -288,7 +291,7 @@ class TurnState():
             return self.get_dice_to_save2(roll_orig)
 
         def pop_member(dice):
-            if dice in self.saved:
+            if dice in self.saved_dice:
                 self.saved_dice.remove(dice)
                 return None
             else:
@@ -331,7 +334,7 @@ def get_turn_score(test_turn):
     print("\nYour dice from that turn are: ")
     print(test_turn.saved_dice)
     field = input("Where do you want to put your points? ")
-    # pts = int(input("How many points should I put there? "))
+    field.strip()
     return field
 
 
