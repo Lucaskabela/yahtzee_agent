@@ -173,15 +173,39 @@ class ScoreRound():
         return 50 if 5 in num_same else 0
 
     def display_score(self):
-        header = ['FIELDS: |']
-        scores = ['SCORES: |']
+        #header = ['fields: |']
+        #scores = ['scores: |']
+        header = ['|']
+        scores = ['|']
+
+        width = 73
+        for i in range(0, width):
+            print('-', sep='', end='')
+        print('')
         for field in self.rows:
-            score = str(self.__dict__[field]) if self.__dict__[field] is not None else '---'
-            header.append('{0:^10s}|'.format(field))
-            scores.append('{0:^10s}|'.format(score))
+            score = str(self.__dict__[field]
+                        ) if self.__dict__[field] is not None else '---'
+            header.append(' {0:^15s} |'.format(ScoreRound.row_pretty(field)))
+            scores.append(' {0:^15s} |'.format(score))
+            if len(''.join(header)) >= 80 or len(''.join(scores)) >= 80:
+                print(''.join(header[:-1]))
+                print(''.join(scores[:-1]))
+                #width = len(''.join(header[:-1]))
+                width = 73
+                for i in range(0, width):
+                    print('-', sep='', end='')
+                print('')
+                #header = ['fields: |', header[-1:][0]]
+                #scores = ['scores: |', scores[-1:][0]]
+                header = ['|', header[-1:][0]]
+                scores = ['|', scores[-1:][0]]
 
         print(''.join(header))
         print(''.join(scores))
+        width = len(''.join(header))
+        for i in range(0, width):
+            print('-', sep='', end='')
+        print('')
 
 
 class TurnState():
@@ -299,8 +323,7 @@ class TurnState():
                 return self.get_dice_to_unsave()
 
         for dice in nums:
-           pop_member(dice)
-
+            pop_member(dice)
 
     def save_rolled(self, just_rolled, indices):
         if self.dice_roll == 3:
