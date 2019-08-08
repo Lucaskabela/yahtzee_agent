@@ -16,6 +16,5 @@ Functionality is in place, time to start on Agent!!!
 NOTE:  Would like to perform a code refactor before that, just to add structure	
 
 1. Need Agent
-	a. Decision Making
-		- likely rule based (optimal solution is discovered, only like a million
-		  states.
+	a. Seems that the way to go is to actually generate table of all expected 
+	   outcomes, then use this table of enumerated states to take optimal
